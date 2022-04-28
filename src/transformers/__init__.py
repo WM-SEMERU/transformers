@@ -204,6 +204,7 @@ _import_structure = {
     "models.gpt2": ["GPT2_PRETRAINED_CONFIG_ARCHIVE_MAP", "GPT2Config", "GPT2Tokenizer"],
     "models.gpt_neo": ["GPT_NEO_PRETRAINED_CONFIG_ARCHIVE_MAP", "GPTNeoConfig"],
     "models.gptj": ["GPTJ_PRETRAINED_CONFIG_ARCHIVE_MAP", "GPTJConfig"],
+    "models.codeformer": ["CODEFORMER_PRETRAINED_CONFIG_ARCHIVE_MAP", "CodeformerConfig"],
     "models.herbert": ["HerbertTokenizer"],
     "models.hubert": ["HUBERT_PRETRAINED_CONFIG_ARCHIVE_MAP", "HubertConfig"],
     "models.ibert": ["IBERT_PRETRAINED_CONFIG_ARCHIVE_MAP", "IBertConfig"],
@@ -1069,6 +1070,16 @@ if is_torch_available():
             "GPTJForSequenceClassification",
             "GPTJModel",
             "GPTJPreTrainedModel",
+        ]
+    )
+    _import_structure["models.codeformer"].extend(
+        [
+            "CODEFORMER_PRETRAINED_MODEL_ARCHIVE_LIST",
+            "CodeformerForCausalLM",
+            "CodeformerForQuestionAnswering",
+            "CodeformerForSequenceClassification",
+            "CodeformerModel",
+            "CodeformerPreTrainedModel",
         ]
     )
     _import_structure["models.hubert"].extend(
@@ -1973,6 +1984,15 @@ if is_tf_available():
             "TFGPTJPreTrainedModel",
         ]
     )
+    _import_structure["models.codeformer"].extend(
+        [
+            "TFCodeformerForCausalLM",
+            "TFCodeformerForQuestionAnswering",
+            "TFCodeformerForSequenceClassification",
+            "TFCodeformerModel",
+            "TFCodeformerPreTrainedModel",
+        ]
+    )
     _import_structure["models.hubert"].extend(
         [
             "TF_HUBERT_PRETRAINED_MODEL_ARCHIVE_LIST",
@@ -2373,6 +2393,7 @@ if is_flax_available():
         ["FlaxGPTNeoForCausalLM", "FlaxGPTNeoModel", "FlaxGPTNeoPreTrainedModel"]
     )
     _import_structure["models.gptj"].extend(["FlaxGPTJForCausalLM", "FlaxGPTJModel", "FlaxGPTJPreTrainedModel"])
+    _import_structure["models.codeformer"].extend(["FlaxCodeformerForCausalLM", "FlaxCodeformerModel", "FlaxCodeformerPreTrainedModel"])
     _import_structure["models.marian"].extend(
         [
             "FlaxMarianModel",
@@ -2602,6 +2623,7 @@ if TYPE_CHECKING:
     from .models.gpt2 import GPT2_PRETRAINED_CONFIG_ARCHIVE_MAP, GPT2Config, GPT2Tokenizer
     from .models.gpt_neo import GPT_NEO_PRETRAINED_CONFIG_ARCHIVE_MAP, GPTNeoConfig
     from .models.gptj import GPTJ_PRETRAINED_CONFIG_ARCHIVE_MAP, GPTJConfig
+    from .models.codeformer import CODEFORMER_PRETRAINED_CONFIG_ARCHIVE_MAP, CodeformerConfig
     from .models.herbert import HerbertTokenizer
     from .models.hubert import HUBERT_PRETRAINED_CONFIG_ARCHIVE_MAP, HubertConfig
     from .models.ibert import IBERT_PRETRAINED_CONFIG_ARCHIVE_MAP, IBertConfig
@@ -3334,6 +3356,14 @@ if TYPE_CHECKING:
             GPTJForSequenceClassification,
             GPTJModel,
             GPTJPreTrainedModel,
+        )
+        from .models.codeformer import (
+            CODEFORMER_PRETRAINED_MODEL_ARCHIVE_LIST,
+            CodeformerForCausalLM,
+            CodeformerForQuestionAnswering,
+            CodeformerForSequenceClassification,
+            CodeformerModel,
+            CodeformerPreTrainedModel,
         )
         from .models.hubert import (
             HUBERT_PRETRAINED_MODEL_ARCHIVE_LIST,
@@ -4092,6 +4122,13 @@ if TYPE_CHECKING:
             TFGPTJModel,
             TFGPTJPreTrainedModel,
         )
+        from .models.codeformer import (
+            TFCodeformerForCausalLM,
+            TFCodeformerForQuestionAnswering,
+            TFCodeformerForSequenceClassification,
+            TFCodeformerModel,
+            TFCodeformerPreTrainedModel,
+        )
         from .models.hubert import (
             TF_HUBERT_PRETRAINED_MODEL_ARCHIVE_LIST,
             TFHubertForCTC,
@@ -4401,6 +4438,7 @@ if TYPE_CHECKING:
         from .models.gpt2 import FlaxGPT2LMHeadModel, FlaxGPT2Model, FlaxGPT2PreTrainedModel
         from .models.gpt_neo import FlaxGPTNeoForCausalLM, FlaxGPTNeoModel, FlaxGPTNeoPreTrainedModel
         from .models.gptj import FlaxGPTJForCausalLM, FlaxGPTJModel, FlaxGPTJPreTrainedModel
+        from .models.codeformer import FlaxCodeformerForCausalLM, FlaxCodeformerModel, FlaxCodeformerPreTrainedModel
         from .models.marian import FlaxMarianModel, FlaxMarianMTModel, FlaxMarianPreTrainedModel
         from .models.mbart import (
             FlaxMBartForConditionalGeneration,

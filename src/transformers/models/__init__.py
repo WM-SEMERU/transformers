@@ -61,6 +61,7 @@ from . import (
     gpt2,
     gpt_neo,
     gptj,
+    codeformer,
     herbert,
     hubert,
     ibert,
