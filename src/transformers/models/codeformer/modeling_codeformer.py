@@ -886,7 +886,8 @@ class CodeformerForCodeLM(CodeformerPreTrainedModel):
         super().__init__(config)
         self.transformer = CodeformerModel(config)
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size)
-        self.code_head = nn.Linear(config.n_embd, config.ast_vocab_size)
+        self.ast_parent_node_head = nn.Linear(config.n_embd, config.ast_vocab_size)
+        self.ast_node_head = nn.Linear(config.n_embd, config.ast_vocab_size)
 
         # Model parallel
         self.model_parallel = False
@@ -905,7 +906,8 @@ class CodeformerForCodeLM(CodeformerPreTrainedModel):
         assert_device_map(self.device_map, len(self.transformer.h))
         self.transformer.parallelize(self.device_map)
         self.lm_head = self.lm_head.to(self.transformer.first_device)
-        self.code_head = self.code_head.to(self.transformer.first_device)
+        self.ast_parent_node_head = self.ast_parent_node_head.to(self.transformer.first_device)
+        self.ast_node_head = self.ast_node_head.to(self.transformer.first_device)
         self.model_parallel = True
 
     @add_start_docstrings(DEPARALLELIZE_DOCSTRING)
@@ -913,7 +915,8 @@ class CodeformerForCodeLM(CodeformerPreTrainedModel):
         self.transformer.deparallelize()
         self.transformer = self.transformer.to("cpu")
         self.lm_head = self.lm_head.to("cpu")
-        self.code_head = self.code_head.to("cpu")
+        self.ast_parent_node_head = self.ast_parent_node_head.to("cpu")
+        self.ast_node_head = self.ast_node_head.to("cpu")
         self.model_parallel = False
         torch.cuda.empty_cache()
 
@@ -968,6 +971,7 @@ class CodeformerForCodeLM(CodeformerPreTrainedModel):
         head_mask=None,
         inputs_embeds=None,
         labels=None,
+        ast_parent_node_labels=None,
         ast_node_labels=None,
         use_cache=None,
         output_attentions=None,
@@ -1006,18 +1010,22 @@ class CodeformerForCodeLM(CodeformerPreTrainedModel):
         # compute loss in fp32 to match with mesh-tf version
         # https://github.com/EleutherAI/gpt-neo/blob/89ce74164da2fb16179106f54e2269b5da8db333/models/gpt2/gpt2.py#L179
         lm_logits = self.lm_head(hidden_states).to(torch.float32)
-        ast_node_logits = self.code_head(hidden_states).to(torch.float32)
+        ast_parent_node_logits = self.ast_node_parent_head(hidden_states).to(torch.float32)
+        ast_node_logits = self.ast_node_head(hidden_states).to(torch.float32)
 
         loss = None
-        if labels is not None and ast_node_labels is not None:
+        if labels is not None and ast_parent_node_labels is not None and ast_node_labels is not None:
             # Shift so that tokens < n predict n
             shift_logits = lm_logits[..., :-1, :].contiguous()
+            shift_ast_parent_node_logits = ast_parent_node_logits[..., :-1, :].contiguous()
             shift_ast_node_logits = ast_node_logits[..., :-1, :].contiguous()
             shift_labels = labels[..., 1:].contiguous()
+            shift_ast_parent_node_labels = ast_parent_node_labels[..., 1:].contiguous()
             shift_ast_node_labels = ast_node_labels[..., 1:].contiguous()
             # Flatten the tokens
             loss_fct = CrossEntropyLoss()
             loss = loss_fct(shift_logits.view(-1, shift_logits.size(-1)), shift_labels.view(-1))
+            loss += loss_fct(shift_ast_parent_node_logits.view(-1, shift_ast_parent_node_logits.size(-1)), shift_ast_parent_node_labels.view(-1))
             loss += loss_fct(shift_ast_node_logits.view(-1, shift_ast_node_logits.size(-1)), shift_ast_node_labels.view(-1))
 
             loss = loss.to(hidden_states.dtype)
