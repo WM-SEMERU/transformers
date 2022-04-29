@@ -43,6 +43,9 @@ class CodeformerConfig(PretrainedConfig):
         vocab_size (`int`, *optional*, defaults to 50400):
             Vocabulary size of the codeformer model. Defines the number of different tokens that can be represented by the
             `inputs_ids` passed when calling [`CodeformerModel`].
+        ast_vocab_size (`int`, *optional*, defaults to 64):
+            AST vocabulary size of the codeformer model. Defines the number of different AST nodes that can be represented by the
+            `ast_node_labels` passed when calling [`CodeformerModel`].
         n_positions (`int`, *optional*, defaults to 2048):
             The maximum sequence length that this model might ever be used with. Typically set this to something large
             just in case (e.g., 512 or 1024 or 2048).
@@ -98,6 +101,7 @@ class CodeformerConfig(PretrainedConfig):
     def __init__(
         self,
         vocab_size=50400,
+        ast_vocab_size=64,
         n_positions=2048,
         n_embd=4096,
         n_layer=28,
@@ -118,6 +122,7 @@ class CodeformerConfig(PretrainedConfig):
         **kwargs
     ):
         self.vocab_size = vocab_size
+        self.ast_node_size = ast_node_size
         self.n_positions = n_positions
         self.n_embd = n_embd
         self.n_layer = n_layer
